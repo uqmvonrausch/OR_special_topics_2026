@@ -7,13 +7,6 @@ with open("./data/scenario_1.json") as data_file:
 
 MINS_PER_HOUR = 60
 
-# OBJ1_WEIGHT = 1/20642.60
-# OBJ2_WEIGHT = 1/(17.44 * MINS_PER_HOUR)
-# OBJ3_WEIGHT = 1/(8.55 * MINS_PER_HOUR)
-OBJ1_WEIGHT = 1
-OBJ2_WEIGHT = 1
-OBJ3_WEIGHT = 1
-
 class TruckState(Enum):
     LOADED = 1
     UNLOADED = 2
@@ -66,9 +59,6 @@ def calc_task_duration(shovel_idx: int, dump_idx: int, state: TruckState):
 
     return (distance_m / speed_kph) * MINS_PER_HOUR / 1000 + operation_time_min
 
-for i in [f"Shovel {i} to dump {j}: {calc_task_duration(i,j,l)}\n" for i in S for j in D for l in [TruckState.LOADED, TruckState.UNLOADED]]:
-    print(i)
-
 task_duration = {t:
                  allocation_model.addConstr(gp.quicksum(X[i,j,t] * calc_task_duration(i,j,TruckState.LOADED) +
                                                         Y[j,i,t] * calc_task_duration(i,j,TruckState.UNLOADED)
@@ -86,20 +76,12 @@ flow_at_dump = {j:
                                              == gp.quicksum(Y[j,i,t] for i in S for t in T))
                   for j in D}
 
+# Maximise profit (revenue - running costs)
 allocation_model.setObjective(
-    OBJ1_WEIGHT * gp.quicksum((data["distance_matrix"][i][j] / 1000) * (X[i,j,t] * (data["cost_loaded_per_m"] + data["fixed_cost_loaded_per_m"]) +
+    gp.quicksum(data["revenue_per_ton"] * data["truck_capacity_tons"] * X[i,j,t] for i in S for j in D for t in T) - 
+    gp.quicksum((data["distance_matrix"][i][j] / 1000) * (X[i,j,t] * (data["cost_loaded_per_m"] + data["fixed_cost_loaded_per_m"]) +
                                                                Y[j,i,t] * (data["cost_unloaded_per_m"] + data["fixed_cost_unloaded_per_m"]))
-                                                               for i in S for j in D for t in T) #+
-    # OBJ2_WEIGHT * gp.quicksum(data["shift_duration_hours"] * MINS_PER_HOUR -
-    #                           gp.quicksum(X[i,j,t] * calc_task_duration(i,j,TruckState.LOADED) +
-    #                                       Y[j,i,t] * calc_task_duration(i,j,TruckState.UNLOADED)
-    #                                         for i in S for j in D)
-    #                           for t in T)# +
-    # OBJ3_WEIGHT * gp.quicksum(data["shift_duration_hours"] * MINS_PER_HOUR -
-    #                           gp.quicksum(Y[j,i,t] * data["loading_time_min"]
-    #                                       for j in D for t in T)
-    #                           for i in S)
-                              , gp.GRB.MINIMIZE)
+                                                               for i in S for j in D for t in T), gp.GRB.MAXIMIZE)
                 
 allocation_model.optimize()
 
@@ -112,3 +94,12 @@ for t in T:
     print(loaded_jobs)
     print(f"Unloaded Jobs:")
     print(unloaded_jobs)
+
+K = {t: range(sum(X[i,j,t].x for i in S for j in D for t in T))}
+
+
+scheduling_model = gp.Model()
+
+Xk = {(i,j,k,t):
+       scheduling_model.addVar(gp.GRB.BINARY, name=f"Xk_{i},{j},{k},{t}")
+       for i in S for j in D for k in }
