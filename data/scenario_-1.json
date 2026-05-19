@@ -1,0 +1,27 @@
+{
+    "n_trucks": 6,
+    "shift_duration_hours": 8,
+    "truck_capacity_tons": 35,
+    "speed_unloaded_kph": 35,
+    "speed_loaded_kph": 30,
+    "cost_loaded_per_m": 500,
+    "cost_unloaded_per_m": 250,
+    "fixed_cost_loaded_per_m": 200,
+    "fixed_cost_unloaded_per_m": 100,
+    "revenue_per_ton": 200,
+    "loading_time_min": 5,
+    "unloading_time_min": 3,
+    "shovels": [
+        {"id": 26, "desired_throughput": 1500, "processing_capacity": 3000, "initial_trucks": 1},
+        {"id": 27, "desired_throughput": 1000, "processing_capacity": 2400, "initial_trucks": 1}
+    ],
+    "dumps": [
+        {"id": 12, "desired_throughput": 2000, "processing_capacity": 4000, "initial_trucks": 2},
+        {"id":  8, "desired_throughput": 2000, "processing_capacity": 4000, "initial_trucks": 2}
+    ],
+    "distance_matrix": [
+        [3029.64, 3082.84, 2883.70],
+        [4634.32, 3871.42, 3488.48],
+        [4223.03, 2440.80, 4463.36]
+    ]
+}
