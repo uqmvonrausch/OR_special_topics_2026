@@ -87,6 +87,8 @@ m.setObjective(
     # gp.quicksum((j.distance / 1000) * X[j,t] * (data["cost_loaded_per_m"] + data["fixed_cost_loaded_per_m"]) for j in Jobs for t in T)
     , gp.GRB.MAXIMIZE)
 
+m.setParam("TimeLimit", 600.0)
+
 m.optimize()
 
 if m.Status == gp.GRB.OPTIMAL or m.Status == gp.GRB.SUBOPTIMAL:

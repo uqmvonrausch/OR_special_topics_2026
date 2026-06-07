@@ -67,6 +67,8 @@ m.setObjective(
     # gp.quicksum((r.distance / 1000) * X[r,t] * (data["cost_loaded_per_m"] + data["fixed_cost_loaded_per_m"]) for r in Routes for t in T)
     , gp.GRB.MAXIMIZE)
 
+m.setParam("TimeLimit", 600.0)
+
 m.optimize()
 
 if m.Status == gp.GRB.OPTIMAL or m.Status == gp.GRB.SUBOPTIMAL:
