@@ -97,7 +97,6 @@ for t in T:
 
 K = {t: range(sum(X[i,j,t].x for i in S for j in D for t in T))}
 
-
 scheduling_model = gp.Model()
 
 Xk = {(i,j,k,t):

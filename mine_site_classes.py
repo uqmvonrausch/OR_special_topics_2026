@@ -2,7 +2,6 @@ import math
 from dataclasses import dataclass
 from enum import Enum
 
-
 class TruckState(Enum):
     LOADED = 1
     UNLOADED = 2
@@ -87,6 +86,33 @@ class Job:
 
     def __repr__(self):
         if self.truck_state == TruckState.LOADED:
-            return f"Loaded trip: {self.source} -> {self.destination} [{self.duration} mins]"
+            return f"Loaded trip: {self.source} -> {self.destination} [{self.duration} mins]\n"
         else:
-            return f"Unloaded trip: {self.source} -> {self.destination} [{self.duration} mins]"
+            return f"Unloaded trip: {self.source} -> {self.destination} [{self.duration} mins]\n"
+
+    def __str__(self):
+        return self.__repr__()
+
+class Route():
+    _next_id: int = 0
+    def __init__(self, jobs: list):
+        self.id = Route._next_id
+        Route._next_id += 1
+        self.jobs = jobs
+        self.source = jobs[0].source
+        self.destination = jobs[-1].destination
+        self.distance = sum([j.distance for j in jobs])
+        self.duration = sum([j.duration for j in jobs])
+    
+    def __eq__(self, other):
+        return isinstance(other, Route) and self.jobs == other.jobs
+    
+    def __hash__(self):
+        return hash(tuple(self.jobs))
+    
+    def __repr__(self):
+        ret = ""
+        for job in self.jobs:
+            ret += str(job)
+        return ret
+    
